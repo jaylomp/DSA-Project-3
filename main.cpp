@@ -1,3 +1,7 @@
-//wefwef
-// Created by Jaylom on 7/31/2024.
-//
+#include "HashTable.h"
+#include "BTree.h"
+#include <iostream>
+
+int main() {
+    std::cout << "Hello world!" << std::endl;
+}
