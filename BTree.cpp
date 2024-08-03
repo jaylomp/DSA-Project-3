@@ -86,12 +86,6 @@ BTreeNode* BTreeNode::search(int crimeID) {
     return children[i]->search(crimeID);
 }
 
-void BTree::buildFromDataset(const vector<CrimeRecord>& dataset) {
-    for (const auto& record : dataset) {
-        insert(record);
-    }
-}
-
 
 
 
