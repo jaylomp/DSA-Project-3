@@ -4,28 +4,24 @@
 using namespace std;
 
 class BTreeNode {
-    public:
-        bool leaf;
-        vector<int> keys;
-        vector<BTreeNode*> children;
-        int minDegree;
+public:
+    bool leaf;
+    vector<CrimeRecord> keys;
+    vector<BTreeNode*> children;
+    int minDegree;
 
-        BTreeNode(int t, bool l);
+    BTreeNode(int t, bool l);
 
-        void insertNotfull(int k);
+    void insertNotFull(const CrimeRecord& k);
 
-        void splitChild(int x, BTreeNode* y);
+    void splitChild(int i, BTreeNode* y);
 
-        void traverse();
+    void traverse();
 
-        BTreeNode* search(int key);
+    BTreeNode* search(int crimeID);
 
-        friend class BTree;
-
-
-
+    friend class BTree;
 };
-
 
 
 class BTree {
@@ -35,12 +31,13 @@ public:
 
     BTree(int t) : root(nullptr), minDegree(t) {}
 
-    void traverse() {if (root != nullptr) root->traverse();}
+    void traverse() { if (root != nullptr) root->traverse(); }
 
-    BTreeNode* search(int key) {
-        return (root == nullptr) ? nullptr : root->search(key);
+    BTreeNode* search(int crimeID) {
+        return (root == nullptr) ? nullptr : root->search(crimeID);
     }
 
-    void insert (int k);
+    void insert(const CrimeRecord& k);
 
+    void buildFromDataset(const vector<CrimeRecord>& dataset);
 };
