@@ -33,7 +33,7 @@ public:
     BTreeNode* root;
     int minDegree;
 
-    BTree(int t) {root = nullptr, minDegree = t;}
+    BTree(int t) : root(nullptr), minDegree(t) {}
 
     void traverse() {if (root != nullptr) root->traverse();}
 
