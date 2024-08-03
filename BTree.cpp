@@ -34,6 +34,6 @@ BTreeNode* BTreeNode::search(int key) {
         return nullptr;
     }
 
-    return children[i]->search(k);
+    return children[i]->search(key);
 } 
 
