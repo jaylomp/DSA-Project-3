@@ -122,3 +122,4 @@ vector<CrimeRecord> readCrimeData(const string& filename) {
 
     return records;
 }
+

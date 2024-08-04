@@ -22,4 +22,4 @@ struct CrimeRecord {
     bool operator==(const CrimeRecord& other) const {
         return crimeID == other.crimeID;
     }
-};
+}; 
