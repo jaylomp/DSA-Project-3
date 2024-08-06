@@ -30,6 +30,18 @@ void BTreeNode::insertNotFull(const CrimeRecord& k) {
     }
 }
 
+void BTreeNode::traverse() {
+    int i;
+    for (i = 0; i < keys.size(); i++) {
+        if (!leaf) {
+            children[i]->traverse();
+        }
+        cout << keys[i].crimeID << " ";
+    }
+    if (!leaf) {
+        children[i]->traverse();
+}
+
 void BTreeNode::splitChild(int i, BTreeNode* y) {
     BTreeNode* z = new BTreeNode(y->minDegree, y->leaf);
     z->keys.resize(minDegree - 1);
