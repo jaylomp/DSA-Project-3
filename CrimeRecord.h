@@ -1,20 +1,20 @@
+// CrimeRecord.h
 #pragma once
 #include <string>
 using namespace std;
 
 class CrimeRecord {
 public:
-    int crimeID;
-    string crimeType;
-    string location;
-    string date;
+    int crimeID; // We'll keep this for unique identification
+    string county;
+    string finalLevel;
 
     // Default constructor
-    CrimeRecord() : crimeID(0), crimeType("Unknown"), location("Unknown"), date("Unknown") {}
+    CrimeRecord() : crimeID(0), county("Unknown"), finalLevel("Unknown") {}
 
-    // Parameterized constructor
-    CrimeRecord(int id, const string& type, const string& loc, const string& dt)
-        : crimeID(id), crimeType(type), location(loc), date(dt) {}
+    // Parameterized constructor with all parameters
+    CrimeRecord(int id, const string& cnty, const string& level)
+        : crimeID(id), county(cnty), finalLevel(level) {}
 
     // Overload comparison operators for CrimeRecord
     bool operator<(const CrimeRecord& other) const {
