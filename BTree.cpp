@@ -6,16 +6,6 @@ BTreeNode::BTreeNode(int t, bool l) : minDegree(t), leaf(l), n(0) {
     children.resize(2 * t, nullptr);
 }
 
-// Destructor for BTreeNode to deallocate memory
-BTreeNode::~BTreeNode() {
-    if (!leaf) {
-        for (BTreeNode* child : children) {
-            delete child; // Delete all children recursively
-        }
-    }
-    cout << "BTreeNode with minDegree " << minDegree << " destroyed." << endl;
-}
-
 // Traverse the subtree rooted at this node
 void BTreeNode::traverse() {
     int i;
@@ -129,11 +119,6 @@ BTreeNode* BTreeNode::search(int crimeID) {
 // Constructor for BTree
 BTree::BTree(int t) : root(nullptr), minDegree(t) {}
 
-// Destructor for BTree to deallocate memory
-BTree::~BTree() {
-    delete root; // Delete the root node (and its children recursively)
-    cout << "BTree destroyed." << endl;
-}
 
 // Traverse the BTree starting from the root
 void BTree::traverse() {
@@ -143,4 +128,22 @@ void BTree::traverse() {
 // Search for a key in the BTree
 BTreeNode* BTree::search(int crimeID) {
     return (root == nullptr) ? nullptr : root->search(crimeID);
+}
+
+// destructor for proper memory management
+BTree::~BTree() {
+    std::cout << "Deleting BTree" << std::endl;
+    delete root;
+}
+
+BTreeNode::~BTreeNode() {
+    std::cout << "Deleting BTreeNode with keys: ";
+    for (int i = 0; i < n; i++) {
+        std::cout << keys[i].crimeID << " ";
+    }
+    std::cout << std::endl;
+
+    for (auto child : children) {
+        delete child;
+    }
 }
