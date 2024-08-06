@@ -8,6 +8,7 @@ public:
     int crimeID; // We'll keep this for unique identification
     string county;
     string finalLevel;
+    int count;
 
     // Default constructor
     CrimeRecord() : crimeID(0), county("Unknown"), finalLevel("Unknown") {}

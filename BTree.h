@@ -5,7 +5,8 @@
 #include <fstream>
 #include <chrono>
 #include <sstream>
-#include "C.h"
+#include "CrimeRecord.h"
+#include "FileHelpers.h"
 
 using namespace std;
 
