@@ -1,25 +1,51 @@
 #include "BTree.h"
 
-BTreeNode::BTreeNode(int t, bool l) {
-    minDegree = t;
-    leaf = l;
+// Constructor for BTreeNode
+BTreeNode::BTreeNode(int t, bool l) : minDegree(t), leaf(l), n(0) {
+    keys.resize(2 * t - 1);
+    children.resize(2 * t, nullptr);
 }
 
+// Destructor for BTreeNode to deallocate memory
+BTreeNode::~BTreeNode() {
+    if (!leaf) {
+        for (BTreeNode* child : children) {
+            delete child; // Delete all children recursively
+        }
+    }
+    cout << "BTreeNode with minDegree " << minDegree << " destroyed." << endl;
+}
+
+// Traverse the subtree rooted at this node
+void BTreeNode::traverse() {
+    int i;
+    for (i = 0; i < n; i++) {
+        if (!leaf)
+            children[i]->traverse();
+        cout << " " << keys[i].crimeID;
+    }
+
+    if (!leaf)
+        children[i]->traverse();
+}
+
+// Insert a key into a non-full node
 void BTreeNode::insertNotFull(const CrimeRecord& k) {
-    int i = keys.size() - 1;
+    int i = n - 1;
+
     if (leaf) {
-        keys.push_back(CrimeRecord());
         while (i >= 0 && keys[i] > k) {
             keys[i + 1] = keys[i];
             i--;
         }
         keys[i + 1] = k;
+        n = n + 1;
     } else {
         while (i >= 0 && keys[i] > k) {
             i--;
         }
         i++;
-        if (children[i]->keys.size() == 2 * minDegree - 1) {
+        if (children[i]->n == 2 * minDegree - 1) {
             splitChild(i, children[i]);
             if (keys[i] < k) {
                 i++;
@@ -29,46 +55,46 @@ void BTreeNode::insertNotFull(const CrimeRecord& k) {
     }
 }
 
-void BTreeNode::traverse() {
-    int i;
-    for (i = 0; i < keys.size(); i++) {
-        if (!leaf) {
-            children[i]->traverse();
-        }
-        cout << keys[i].crimeID << " ";
-    }
-    if (!leaf) {
-        children[i]->traverse();
-    }
-    cout << endl;
-}
-
+// Split a full child node into two nodes
 void BTreeNode::splitChild(int i, BTreeNode* y) {
     BTreeNode* z = new BTreeNode(y->minDegree, y->leaf);
-    z->keys.resize(minDegree - 1);
+    z->n = minDegree - 1;
+
     for (int j = 0; j < minDegree - 1; j++) {
         z->keys[j] = y->keys[j + minDegree];
     }
+
     if (!y->leaf) {
-        z->children.resize(minDegree);
         for (int j = 0; j < minDegree; j++) {
             z->children[j] = y->children[j + minDegree];
         }
     }
-    y->keys.resize(minDegree - 1);
-    children.insert(children.begin() + i + 1, z);
-    keys.insert(keys.begin() + i, y->keys[minDegree - 1]);
-    y->keys.pop_back();
+
+    y->n = minDegree - 1;
+
+    for (int j = n; j >= i + 1; j--) {
+        children[j + 1] = children[j];
+    }
+    children[i + 1] = z;
+
+    for (int j = n - 1; j >= i; j--) {
+        keys[j + 1] = keys[j];
+    }
+    keys[i] = y->keys[minDegree - 1];
+
+    n = n + 1;
 }
 
+// Insert a new key into the BTree
 void BTree::insert(const CrimeRecord& k) {
     if (root == nullptr) {
         root = new BTreeNode(minDegree, true);
-        root->keys.push_back(k);
+        root->keys[0] = k;
+        root->n = 1;
     } else {
-        if (root->keys.size() == 2 * minDegree - 1) {
+        if (root->n == 2 * minDegree - 1) {
             BTreeNode* s = new BTreeNode(minDegree, false);
-            s->children.push_back(root);
+            s->children[0] = root;
             s->splitChild(0, root);
             int i = 0;
             if (s->keys[0] < k) {
@@ -82,13 +108,14 @@ void BTree::insert(const CrimeRecord& k) {
     }
 }
 
+// Search for a key in the subtree rooted at this node
 BTreeNode* BTreeNode::search(int crimeID) {
     int i = 0;
-    while (i < keys.size() && crimeID > keys[i].crimeID) {
+    while (i < n && crimeID > keys[i].crimeID) {
         i++;
     }
 
-    if (i < keys.size() && keys[i].crimeID == crimeID) {
+    if (i < n && keys[i].crimeID == crimeID) {
         return this;
     }
 
@@ -99,41 +126,21 @@ BTreeNode* BTreeNode::search(int crimeID) {
     return children[i]->search(crimeID);
 }
 
-// For parsing dataset
-vector<CrimeRecord> readCrimeData(const string& filename) {
-    vector<CrimeRecord> records;
-    ifstream file(filename);
-    string line, word;
+// Constructor for BTree
+BTree::BTree(int t) : root(nullptr), minDegree(t) {}
 
-    if (file.is_open()) {
-        while (getline(file, line)) {
-            if (line.empty()) continue; // Skip empty lines
-            stringstream str(line);
-            CrimeRecord record;
-            
-            // Parsing and error handling
-            try {
-                getline(str, word, ','); // CrimeID
-                record.crimeID = stoi(word);
+// Destructor for BTree to deallocate memory
+BTree::~BTree() {
+    delete root; // Delete the root node (and its children recursively)
+    cout << "BTree destroyed." << endl;
+}
 
-                getline(str, word, ','); // Type
-                record.type = word;
+// Traverse the BTree starting from the root
+void BTree::traverse() {
+    if (root != nullptr) root->traverse();
+}
 
-                getline(str, word, ','); // Date
-                record.date = word;
-
-                getline(str, word, ','); // Location
-                record.location = word;
-
-                records.push_back(record);
-            } catch (const exception& e) {
-                cerr << "Error parsing line: " << line << " - " << e.what() << endl;
-            }
-        }
-        file.close();
-    } else {
-        cerr << "Could not open the file!" << endl;
-    }
-
-    return records;
+// Search for a key in the BTree
+BTreeNode* BTree::search(int crimeID) {
+    return (root == nullptr) ? nullptr : root->search(crimeID);
 }
