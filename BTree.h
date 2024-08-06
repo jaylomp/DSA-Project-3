@@ -42,7 +42,6 @@ public:
     // Constructor for BTree
     BTree(int t);
 
-    // Destructor for BTree to deallocate memory
     ~BTree();
 
     // Traverse the BTree starting from the root
