@@ -55,4 +55,7 @@ public:
 
     // Build BTree from a dataset (declared but not defined)
     void buildFromDataset(const vector<CrimeRecord>& dataset);
+
+
+    double timeSearch(int crimeID);
 };
