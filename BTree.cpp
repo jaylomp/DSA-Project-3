@@ -1,4 +1,5 @@
 #include "BTree.h"
+#include <chrono>
 
 // Constructor for BTreeNode
 BTreeNode::BTreeNode(int t, bool l) : minDegree(t), leaf(l), n(0) {
@@ -50,30 +51,37 @@ void BTreeNode::splitChild(int i, BTreeNode* y) {
     BTreeNode* z = new BTreeNode(y->minDegree, y->leaf);
     z->n = minDegree - 1;
 
+    // Copy the second half of y's keys to z
     for (int j = 0; j < minDegree - 1; j++) {
         z->keys[j] = y->keys[j + minDegree];
     }
 
+    // Copy the second half of y's children to z if y is not a leaf
     if (!y->leaf) {
         for (int j = 0; j < minDegree; j++) {
             z->children[j] = y->children[j + minDegree];
+            y->children[j + minDegree] = nullptr; // Clear the child pointer in y
         }
     }
 
     y->n = minDegree - 1;
 
+    // Move children of this node to make space for z
     for (int j = n; j >= i + 1; j--) {
         children[j + 1] = children[j];
     }
     children[i + 1] = z;
 
+    // Move keys of this node to make space for the middle key of y
     for (int j = n - 1; j >= i; j--) {
         keys[j + 1] = keys[j];
     }
     keys[i] = y->keys[minDegree - 1];
+    y->keys[minDegree - 1] = CrimeRecord(); // Clear the moved key
 
-    n = n + 1;
+    n++;
 }
+
 
 // Insert a new key into the BTree
 void BTree::insert(const CrimeRecord& k) {
@@ -143,7 +151,30 @@ BTreeNode::~BTreeNode() {
     }
     std::cout << std::endl;
 
-    for (auto child : children) {
-        delete child;
+    // Delete child nodes
+    for (auto& child : children) {
+        if (child != nullptr) {
+            delete child;
+            child = nullptr;
+        }
     }
+}
+
+
+
+
+double BTree::timeSearch(int crimeID) {
+    auto start = chrono::high_resolution_clock::now();
+    BTreeNode* result = search(crimeID);
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double, milli> duration = end - start;
+
+    // Just to ensure result is used, otherwise, the compiler might optimize the search call away
+    if (result != nullptr) {
+        cout << "CrimeRecord found with crimeID: " << crimeID << endl;
+    } else {
+        cout << "CrimeRecord not found with crimeID: " << crimeID << endl;
+    }
+
+    return duration.count();
 }
