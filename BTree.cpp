@@ -1,6 +1,5 @@
 #include "BTree.h"
 
-
 BTreeNode::BTreeNode(int t, bool l) {
     minDegree = t;
     leaf = l;
@@ -40,6 +39,8 @@ void BTreeNode::traverse() {
     }
     if (!leaf) {
         children[i]->traverse();
+    }
+    cout << endl;
 }
 
 void BTreeNode::splitChild(int i, BTreeNode* y) {
@@ -98,10 +99,7 @@ BTreeNode* BTreeNode::search(int crimeID) {
     return children[i]->search(crimeID);
 }
 
-
-
-
-//for parsing datasheet
+// For parsing dataset
 vector<CrimeRecord> readCrimeData(const string& filename) {
     vector<CrimeRecord> records;
     ifstream file(filename);
@@ -109,23 +107,28 @@ vector<CrimeRecord> readCrimeData(const string& filename) {
 
     if (file.is_open()) {
         while (getline(file, line)) {
+            if (line.empty()) continue; // Skip empty lines
             stringstream str(line);
             CrimeRecord record;
             
-            // these are just place holders
-            getline(str, word, ','); // CrimeID
-            record.crimeID = stoi(word);
+            // Parsing and error handling
+            try {
+                getline(str, word, ','); // CrimeID
+                record.crimeID = stoi(word);
 
-            getline(str, word, ','); // Type
-            record.type = word;
+                getline(str, word, ','); // Type
+                record.type = word;
 
-            getline(str, word, ','); // Date
-            record.date = word;
+                getline(str, word, ','); // Date
+                record.date = word;
 
-            getline(str, word, ','); // Location
-            record.location = word;
+                getline(str, word, ','); // Location
+                record.location = word;
 
-            records.push_back(record);
+                records.push_back(record);
+            } catch (const exception& e) {
+                cerr << "Error parsing line: " << line << " - " << e.what() << endl;
+            }
         }
         file.close();
     } else {
@@ -134,4 +137,3 @@ vector<CrimeRecord> readCrimeData(const string& filename) {
 
     return records;
 }
-
