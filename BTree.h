@@ -26,7 +26,6 @@ public:
     friend class BTree;
 };
 
-
 class BTree {
 public:
     BTreeNode* root;
