@@ -1,5 +1,6 @@
-#include "BTree.h"
-#include <chrono>
+#include "B.h"
+#include <iostream>
+#include <algorithm> // For std::transform
 
 // Constructor for BTreeNode
 BTreeNode::BTreeNode(int t, bool l) : minDegree(t), leaf(l), n(0) {
@@ -82,7 +83,6 @@ void BTreeNode::splitChild(int i, BTreeNode* y) {
     n++;
 }
 
-
 // Insert a new key into the BTree
 void BTree::insert(const CrimeRecord& k) {
     if (root == nullptr) {
@@ -127,7 +127,6 @@ BTreeNode* BTreeNode::search(int crimeID) {
 // Constructor for BTree
 BTree::BTree(int t) : root(nullptr), minDegree(t) {}
 
-
 // Traverse the BTree starting from the root
 void BTree::traverse() {
     if (root != nullptr) root->traverse();
@@ -138,12 +137,13 @@ BTreeNode* BTree::search(int crimeID) {
     return (root == nullptr) ? nullptr : root->search(crimeID);
 }
 
-// destructor for proper memory management
+// Destructor for proper memory management
 BTree::~BTree() {
     std::cout << "Deleting BTree" << std::endl;
     delete root;
 }
 
+// Destructor for BTreeNode to deallocate memory
 BTreeNode::~BTreeNode() {
     std::cout << "Deleting BTreeNode with keys: ";
     for (int i = 0; i < n; i++) {
@@ -161,28 +161,60 @@ BTreeNode::~BTreeNode() {
 }
 
 
-
-
-double BTree::timeSearch(int crimeID) {
-    auto start = chrono::high_resolution_clock::now();
-    BTreeNode* result = search(crimeID);
-    auto end = chrono::high_resolution_clock::now();
-    chrono::duration<double, milli> duration = end - start;
-
-    // Just to ensure result is used, otherwise, the compiler might optimize the search call away
-    if (result != nullptr) {
-        cout << "CrimeRecord found with crimeID: " << crimeID << endl;
-    } else {
-        cout << "CrimeRecord not found with crimeID: " << crimeID << endl;
-    }
-
-    return duration.count();
-}
-
-
+// Function to build the BTree from a dataset
 void BTree::buildFromDataset(const vector<CrimeRecord>& dataset) {
     for (const auto& record : dataset) {
         insert(record);
     }
 }
 
+// Function to read a limited number of records from CSV
+vector<CrimeRecord> BTree::readCSV(const string& filename, int numRecords) {
+    ifstream file(filename);
+    vector<CrimeRecord> dataset;
+    string line;
+
+    if (!file.is_open()) {
+        cerr << "Error opening file." << endl;
+        return dataset;
+    }
+
+    // Skip the header line
+    getline(file, line);
+
+    // Read each line of the CSV
+    int recordCounter = 0;
+    while (getline(file, line) && (numRecords == -1 || recordCounter < numRecords)) {
+        stringstream ss(line);
+        string cell;
+        vector<string> row;
+
+        while (getline(ss, cell, ',')) {
+            row.push_back(cell);
+        }
+
+        // Assuming county is at index 1 and finalLevel is at index 27
+        string county = row[1];
+        string finalLevel = row[27];
+
+        // Remove potential leading/trailing spaces (optional)
+        county.erase(0, county.find_first_not_of(' ')); // Left trim
+        county.erase(county.find_last_not_of(' ') + 1); // Right trim
+        finalLevel.erase(0, finalLevel.find_first_not_of(' ')); // Left trim
+        finalLevel.erase(finalLevel.find_last_not_of(' ') + 1); // Right trim
+
+        // Debugging: Print parsed county and finalLevel
+        cout<< county << " " << finalLevel << endl;
+
+        // Create a CrimeRecord object and add to the dataset
+        // Using crimeID as a simple integer counter for demonstration
+        static int crimeIDCounter = 1;
+        CrimeRecord record(crimeIDCounter++, county, finalLevel);
+        dataset.push_back(record);
+
+        recordCounter++;
+    }
+
+    file.close();
+    return dataset;
+}
