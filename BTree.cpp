@@ -178,3 +178,11 @@ double BTree::timeSearch(int crimeID) {
 
     return duration.count();
 }
+
+
+void BTree::buildFromDataset(const vector<CrimeRecord>& dataset) {
+    for (const auto& record : dataset) {
+        insert(record);
+    }
+}
+
