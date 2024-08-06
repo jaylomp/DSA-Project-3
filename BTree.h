@@ -4,7 +4,7 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-#include "CrimeRecord.h"
+#include "C.h"
 
 using namespace std;
 
@@ -34,7 +34,7 @@ public:
     // Search for a key in the subtree rooted at this node
     BTreeNode* search(int crimeID);
 
-    friend class BTree;
+    friend class BTree; // Allow BTree to access private members of BTreeNode
 };
 
 class BTree {
@@ -56,9 +56,9 @@ public:
     // Insert a new key into the BTree
     void insert(const CrimeRecord& k);
 
-    // Build BTree from a dataset (declared but not defined)
+    // Build BTree from a dataset
     void buildFromDataset(const vector<CrimeRecord>& dataset);
 
-
-    double timeSearch(int crimeID);
+    // Read CSV and return a dataset of CrimeRecord objects
+    vector<CrimeRecord> readCSV(const string& filename, int numRecords = -1);
 };
