@@ -1,6 +1,6 @@
-#include "B.h"
+#include "BTree.h"
 #include <iostream>
-#include <algorithm> // For std::transform
+#include <algorithm>
 
 // Constructor for BTreeNode
 BTreeNode::BTreeNode(int t, bool l) : minDegree(t), leaf(l), n(0) {
@@ -139,13 +139,12 @@ BTreeNode* BTree::search(int crimeID) {
 
 // Destructor for proper memory management
 BTree::~BTree() {
-    std::cout << "Deleting BTree" << std::endl;
+    //std::cout << "Deleting BTree" << std::endl;
     delete root;
 }
 
 // Destructor for BTreeNode to deallocate memory
 BTreeNode::~BTreeNode() {
-    std::cout << "Deleting BTreeNode with keys: ";
     for (int i = 0; i < n; i++) {
         std::cout << keys[i].crimeID << " ";
     }
@@ -203,11 +202,8 @@ vector<CrimeRecord> BTree::readCSV(const string& filename, int numRecords) {
         finalLevel.erase(0, finalLevel.find_first_not_of(' ')); // Left trim
         finalLevel.erase(finalLevel.find_last_not_of(' ') + 1); // Right trim
 
-        // Debugging: Print parsed county and finalLevel
         cout<< county << " " << finalLevel << endl;
 
-        // Create a CrimeRecord object and add to the dataset
-        // Using crimeID as a simple integer counter for demonstration
         static int crimeIDCounter = 1;
         CrimeRecord record(crimeIDCounter++, county, finalLevel);
         dataset.push_back(record);
@@ -218,3 +214,91 @@ vector<CrimeRecord> BTree::readCSV(const string& filename, int numRecords) {
     file.close();
     return dataset;
 }
+
+int BTree::countFeloniesInCounty(const string& county) {
+    if (root != nullptr) {
+        return root->countFeloniesInCounty(county);
+    } else {
+        return 0; // If the tree is empty, return 0
+    }
+}
+
+string normalizeString(const string& str) {
+    string normalized = str;
+
+    // Remove leading and trailing quotes
+    if (!normalized.empty() && normalized.front() == '"') {
+        normalized.erase(0, 1);
+    }
+    if (!normalized.empty() && normalized.back() == '"') {
+        normalized.erase(normalized.size() - 1);
+    }
+
+    // Trim leading spaces
+    normalized.erase(normalized.begin(), std::find_if(normalized.begin(), normalized.end(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }));
+
+    // Trim trailing spaces
+    normalized.erase(std::find_if(normalized.rbegin(), normalized.rend(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }).base(), normalized.end());
+
+    // Convert to lowercase
+    std::transform(normalized.begin(), normalized.end(), normalized.begin(), ::tolower);
+
+    return normalized;
+}
+
+// Update the functions to use normalizeString
+string normalizeCountyName(const string& county) {
+    return normalizeString(county);
+}
+
+string normalizeFinalLevel(const string& level) {
+    return normalizeString(level);
+}
+
+// Count felonies for a specific county in the subtree rooted at this node
+int BTreeNode::countFeloniesInCounty(const string& county) {
+    int count = 0;
+    string normalizedCounty = normalizeCountyName(county);
+
+    // Debug: Print current node being processed
+    //cout << "Processing BTreeNode with keys: ";
+    //for (int i = 0; i < n; i++) {
+        //cout << keys[i].crimeID << " ";
+    //}
+    //cout << endl;
+
+    for (int i = 0; i < n; i++) {
+        string recordCounty = normalizeCountyName(keys[i].county);
+        string recordFinalLevel = normalizeFinalLevel(keys[i].finalLevel);
+
+        // Debug: Print out the counties and finalLevel being compared
+        //cout << "Comparing record county: '" << recordCounty << "' with search county: '" << normalizedCounty << "'" << endl;
+        //cout << "Comparing record final level: '" << recordFinalLevel << "' with 'felony'" << endl;
+
+        // If the current key belongs to the given county and is a felony, increment the count
+        if (recordCounty == normalizedCounty && recordFinalLevel == "felony") {
+            count++;
+            //cout << "Felony found in " << county << " for record ID: " << keys[i].crimeID << endl;
+        }
+    }
+
+    // Recursively count felonies in child nodes
+    if (!leaf) {
+        for (int i = 0; i <= n; i++) {
+            int childCount = children[i]->countFeloniesInCounty(county);
+            //cout << "Count from child node " << i << ": " << childCount << endl;
+            count += childCount;
+        }
+    }
+
+    cout << "Total count for this node: " << count << endl;
+    return count;
+}
+
+
+
+
