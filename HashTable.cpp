@@ -69,10 +69,3 @@ int HashTable::searchCount(const std::string &location) {
     }
 }
 
-void HashTable::iterate() {
-    for (auto& i : table) {
-        for (auto& j: i) {
-            std::cout << j.county << ": " <<  j.count << std::endl;
-        }
-    }
-}
