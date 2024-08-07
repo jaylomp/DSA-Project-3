@@ -1,32 +1,40 @@
 #include "HashTable.h"
 #include "BTree.h"
 #include <iostream>
+#include <chrono>
 
-void menu(BTree& tree) {
+void menu(BTree& tree, HashTable& table) {
     while (true) {
-        
         cout << "\n*** Crime Data Search Menu ***\n";
         cout << "1. Search for felonies in a specific county\n";
         cout << "2. Exit\n";
         cout << "Enter your choice: ";
         int choice;
         cin >> choice;
+        cin.ignore(); // To consume any leftover newline character
 
         if (choice == 1) {
             string countyToSearch;
-            cout << "Enter the county name (or part of it): ";
-            cin.ignore(); // To consume any leftover newline character
+            cout << "Enter the county name (Enter the name in lowercase followed by \"county\"): ";
             getline(cin, countyToSearch);
-
             // Check if county exists and has felonies
-            int felonyCount = tree.countFeloniesInCounty(countyToSearch);
-            if (felonyCount > 0) {
-                cout << "The number of felonies in counties matching \"" << countyToSearch << "\" is: " << felonyCount << endl;
+            auto start = chrono::high_resolution_clock::now();
+            int tableFelonyCount = table.searchCount(countyToSearch);
+            auto stop = chrono::high_resolution_clock::now();
+            auto tableSearchTime = chrono::duration_cast<chrono::nanoseconds>(stop - start);
+            start = chrono::high_resolution_clock::now();
+            int treeFelonyCount = tree.countFeloniesInCounty(countyToSearch);
+            stop = chrono::high_resolution_clock::now();
+            auto treeSearchTime = chrono::duration_cast<chrono::milliseconds>(stop - start);
+            if (tableFelonyCount > 0 && treeFelonyCount > 0) {
+                cout << "Number of felonies is: " << std::endl << "HashTable result: " <<
+                    tableFelonyCount << " felonies" << std::endl << "BTree result: " << treeFelonyCount << " felonies" << std::endl <<
+                        "HashTable search time: " << tableSearchTime.count() << " nanoseconds" << std::endl << "BTree search time: " <<
+                            treeSearchTime.count() << " milliseconds" << std::endl;
             } else {
-                cout << "No felonies found for \"" << countyToSearch << "\" or the county does not exist in the dataset. Please try again.\n";
+                cout << "County not found" << std::endl;
             }
-
-            cout << "\nWould you like to try again? (y/n): ";
+            cout << "\nWould you like to search again? (y/n): ";
             char tryAgain;
             cin >> tryAgain;
 
@@ -54,7 +62,15 @@ int main() {
     }
     auto stop = chrono::high_resolution_clock::now();
     auto tableInsertTime = chrono::duration_cast<chrono::milliseconds>(stop - start);
+    std::cout << "HashTable insert time: " << tableInsertTime.count() << " milliseconds" << std::endl;
+    BTree tree (32);
+    start = chrono::high_resolution_clock::now();
+    tree.buildFromDataset(records);
+    stop = chrono::high_resolution_clock::now();
+    auto treeInsertTime = chrono::duration_cast<chrono::milliseconds>(stop - start);
+    std::cout << "BTree insert time: " << treeInsertTime.count() << " milliseconds" << std::endl;
 
+    menu(tree, table);
     
 
     

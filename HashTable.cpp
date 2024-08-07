@@ -1,4 +1,5 @@
 #include "HashTable.h"
+#include <iostream>
 
 HashTable::HashTable(const int &s, const double &load) {
     size = s;
@@ -68,4 +69,10 @@ int HashTable::searchCount(const std::string &location) {
     }
 }
 
-
+void HashTable::iterate() {
+    for (auto& i : table) {
+        for (auto& j: i) {
+            std::cout << j.county << ": " <<  j.count << std::endl;
+        }
+    }
+}
