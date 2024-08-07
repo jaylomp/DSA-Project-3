@@ -198,7 +198,6 @@ int BTreeNode::countFeloniesInCounty(const string& county) {
             count += children[i]->countFeloniesInCounty(county);
         }
     }
-
     return count; // Return the total count
 }
 
