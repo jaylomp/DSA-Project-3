@@ -11,3 +11,4 @@ vector<CrimeRecord> readCSV(const string& filename, int numRecords);
 string normalizeString(const string& str);
 string normalizeCountyName(const string& county);
 string normalizeFinalLevel(const string& level);
+

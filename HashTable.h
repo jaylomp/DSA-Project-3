@@ -19,3 +19,4 @@ public:
     CrimeRecord* search(const std::string& location);
     int searchCount(const std::string &location);
 };
+
