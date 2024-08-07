@@ -14,7 +14,7 @@ void BTreeNode::traverse() {
     for (i = 0; i < n; i++) {
         if (!leaf)
             children[i]->traverse();
-        cout << " " << keys[i].crimeID;
+        // cout << " " << keys[i].crimeID;
     }
 
     if (!leaf)
@@ -146,9 +146,9 @@ BTree::~BTree() {
 // Destructor for BTreeNode to deallocate memory
 BTreeNode::~BTreeNode() {
     for (int i = 0; i < n; i++) {
-        std::cout << keys[i].crimeID << " ";
+        // std::cout << keys[i].crimeID << " ";
     }
-    std::cout << std::endl;
+    // std::cout << std::endl;
 
     // Delete child nodes
     for (auto& child : children) {
@@ -213,7 +213,7 @@ int BTreeNode::countFeloniesInCounty(const string& county) {
         }
     }
 
-    cout << "Total count for this node: " << count << endl;
+    // cout << "Total count for this node: " << count << endl;
     return count;
 }
 

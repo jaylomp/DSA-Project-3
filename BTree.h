@@ -48,7 +48,7 @@ public:
 
     // New function to count felonies in a specific county
     int countFeloniesInCounty(const string& county);
-
+/*
     double timeCountFeloniesInCounty(const string& county) {
         auto start = std::chrono::high_resolution_clock::now();
         int felonyCount = root->countFeloniesInCounty(county);
@@ -59,4 +59,5 @@ public:
 
         return elapsed.count();
     }
+    */
 };
