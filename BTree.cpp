@@ -14,7 +14,6 @@ void BTreeNode::traverse() {
     for (i = 0; i < n; i++) {
         if (!leaf)
             children[i]->traverse();
-        // cout << " " << keys[i].crimeID;
     }
 
     if (!leaf)
