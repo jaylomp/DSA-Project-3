@@ -180,41 +180,26 @@ int BTree::countFeloniesInCounty(const string& county) {
 // Count felonies for a specific county in the subtree rooted at this node
 int BTreeNode::countFeloniesInCounty(const string& county) {
     int count = 0;
-    string normalizedCounty = normalizeCountyName(county);
-
-    // Debug: Print current node being processed
-    //cout << "Processing BTreeNode with keys: ";
-    //for (int i = 0; i < n; i++) {
-        //cout << keys[i].crimeID << " ";
-    //}
-    //cout << endl;
+    string normalizedCounty = normalizeString(county);
 
     for (int i = 0; i < n; i++) {
-        string recordCounty = normalizeCountyName(keys[i].county);
-        string recordFinalLevel = normalizeFinalLevel(keys[i].finalLevel);
+        string recordCounty = normalizeString(keys[i].county);
+        string recordFinalLevel = normalizeString(keys[i].finalLevel);
 
-        // Debug: Print out the counties and finalLevel being compared
-        //cout << "Comparing record county: '" << recordCounty << "' with search county: '" << normalizedCounty << "'" << endl;
-        //cout << "Comparing record final level: '" << recordFinalLevel << "' with 'felony'" << endl;
-
-        // If the current key belongs to the given county and is a felony, increment the count
-        if (recordCounty == normalizedCounty && recordFinalLevel == "felony") {
+        // Check if the normalized county contains the search string and if the final level is "felony"
+        if (recordCounty.find(normalizedCounty) != string::npos && recordFinalLevel == "felony") {
             count++;
-            //cout << "Felony found in " << county << " for record ID: " << keys[i].crimeID << endl;
         }
     }
 
     // Recursively count felonies in child nodes
     if (!leaf) {
         for (int i = 0; i <= n; i++) {
-            int childCount = children[i]->countFeloniesInCounty(county);
-            //cout << "Count from child node " << i << ": " << childCount << endl;
-            count += childCount;
+            count += children[i]->countFeloniesInCounty(county);
         }
     }
 
-    // cout << "Total count for this node: " << count << endl;
-    return count;
+    return count; // Return the total count
 }
 
 
