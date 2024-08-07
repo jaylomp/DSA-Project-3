@@ -4,6 +4,7 @@
 
 void menu(BTree& tree) {
     while (true) {
+        
         cout << "\n*** Crime Data Search Menu ***\n";
         cout << "1. Search for felonies in a specific county\n";
         cout << "2. Exit\n";
